@@ -10,9 +10,6 @@ import os
 import importlib.util
 import importlib.machinery
 
-from pupy.pupylib.PupyCompleter import commands_completer
-from pupy.pupylib.PupyModule import PupyArgumentParser
-
 from pupy.network.lib.convcompat import shlex
 
 
@@ -168,6 +165,7 @@ class Commands(object):
             if hasattr(command.parser, 'add_help'):
                 parser = command.parser
             else:
+                from pupy.pupylib.PupyModule import PupyArgumentParser
                 parser = command.parser(server, PupyArgumentParser, config)
 
             completer = parser.get_completer()
@@ -175,4 +173,5 @@ class Commands(object):
             return completer.complete, command.__name__, args
 
         except InvalidCommand:
+            from pupy.pupylib.PupyCompleter import commands_completer
             return commands_completer, '', ''
