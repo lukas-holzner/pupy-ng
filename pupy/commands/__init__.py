@@ -7,10 +7,8 @@ from __future__ import print_function
 __all__ = ('InvalidCommand', 'Commands')
 
 import os
-import imp
-
-from pupy.pupylib.PupyCompleter import commands_completer
-from pupy.pupylib.PupyModule import PupyArgumentParser
+import importlib.util
+import importlib.machinery
 
 from pupy.network.lib.convcompat import shlex
 
@@ -30,8 +28,7 @@ class CommandsNamespace(object):
 
 class Commands(object):
     SUFFIXES = tuple([
-        suffix for suffix, _, rtype in imp.get_suffixes() \
-        if rtype == imp.PY_SOURCE
+        suffix for suffix in importlib.machinery.SOURCE_SUFFIXES
     ])
 
     def __init__(self):
@@ -63,7 +60,10 @@ class Commands(object):
 
             if command not in self._commands or self._commands_stats[command] != current_stat.st_mtime:
                 try:
-                    self._commands[command] = imp.load_source(command, source)
+                    spec = importlib.util.spec_from_file_location(command, source)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    self._commands[command] = module
                     self._commands_stats[command] = current_stat.st_mtime
                 except IOError:
                     pass
@@ -165,6 +165,7 @@ class Commands(object):
             if hasattr(command.parser, 'add_help'):
                 parser = command.parser
             else:
+                from pupy.pupylib.PupyModule import PupyArgumentParser
                 parser = command.parser(server, PupyArgumentParser, config)
 
             completer = parser.get_completer()
@@ -172,4 +173,5 @@ class Commands(object):
             return completer.complete, command.__name__, args
 
         except InvalidCommand:
+            from pupy.pupylib.PupyCompleter import commands_completer
             return commands_completer, '', ''

@@ -7,12 +7,12 @@ from __future__ import unicode_literals
 __all__ = ('Triggers')
 
 import os
-import imp
+import importlib.util
+import importlib.machinery
 
 class Triggers(object):
     SUFFIXES = tuple([
-        suffix for suffix, _, rtype in imp.get_suffixes() \
-        if rtype == imp.PY_SOURCE
+        suffix for suffix in importlib.machinery.SOURCE_SUFFIXES
     ])
 
     def __init__(self):
@@ -62,7 +62,10 @@ class Triggers(object):
 
             if trigger not in self._triggers or self._triggers_stats[trigger] != current_stat.st_mtime:
                 try:
-                    self._triggers[trigger] = imp.load_source(trigger, source)
+                    spec = importlib.util.spec_from_file_location(trigger, source)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    self._triggers[trigger] = module
                     self._triggers_stats[trigger] = current_stat.st_mtime
                 except IOError:
                     pass

@@ -16,11 +16,28 @@ else:
     def _reversed_bytes(data):
         return b''.join(reversed(data))
 
-from tinyec.registry import get_curve
-from tinyec.ec import (
-    to_bytes, from_bytes,
-    ec2osp, osp2ec
-)
+try:
+    from tinyec.registry import get_curve
+    from tinyec.ec import (
+        to_bytes, from_bytes,
+        ec2osp, osp2ec
+    )
+except ImportError:
+    # Provide minimal stubs for tinyec when not available
+    def get_curve(name):
+        raise ImportError("tinyec is not available. Install it for ECC support.")
+    
+    def to_bytes(value):
+        raise ImportError("tinyec is not available. Install it for ECC support.")
+    
+    def from_bytes(data):
+        raise ImportError("tinyec is not available. Install it for ECC support.")
+    
+    def ec2osp(point):
+        raise ImportError("tinyec is not available. Install it for ECC support.")
+    
+    def osp2ec(data):
+        raise ImportError("tinyec is not available. Install it for ECC support.")
 
 from . import (
     NewAESCipher, get_random,

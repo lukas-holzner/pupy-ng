@@ -13,7 +13,19 @@ import marshal
 
 from zipfile import ZipFile
 
-from elftools.elf.elffile import ELFFile
+try:
+    from elftools.elf.elffile import ELFFile
+except ImportError:
+    # Provide a stub ELFFile for when pyelftools is not available
+    class ELFFile:
+        def __init__(self, stream):
+            raise ImportError("pyelftools is not available. Install it for ELF file support.")
+        
+        def has_dwarf_info(self):
+            return False
+        
+        def get_dwarf_info(self):
+            return None
 from io import BytesIO
 
 from pupy.pupylib.PupyCompile import pupycompile

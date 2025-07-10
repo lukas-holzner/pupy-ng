@@ -48,3 +48,9 @@ if not getattr(sys, '__from_build_library_zip_compiler__', False):
         from .PupyModule import PupyModule
         from .PupyClient import PupyClient
         from .PupyServer import PupyServer
+
+# Import PupySignalHandler for backward compatibility
+try:
+    from . import PupySignalHandler
+except ImportError:
+    PupySignalHandler = None

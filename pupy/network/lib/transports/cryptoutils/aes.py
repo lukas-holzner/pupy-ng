@@ -94,8 +94,24 @@ except ImportError as e:
             AESModeOfOperationCTR, Counter
         )
     except ImportError as e:
-        logging.exception('pyaes is missing: %s', e)
-        raise e
+        logging.error('pyaes is missing: %s', e)
+        
+        # Create a stub implementation that will fail gracefully
+        class StubAESCipher(object):
+            def __init__(self, aes_key, iv, mode=AES_MODE_CBC):
+                raise ImportError("No AES implementation available. Install pycryptodome or pyaes.")
+                
+            def encrypt(self, data):
+                raise ImportError("No AES implementation available. Install pycryptodome or pyaes.")
+                
+            def decrypt(self, data):
+                raise ImportError("No AES implementation available. Install pycryptodome or pyaes.")
+        
+        def NewAESCipher(aes_key, iv, mode=AES_MODE_CBC):
+            return StubAESCipher(aes_key, iv, mode)
+        
+        # Don't raise the error, just log it and continue
+        # This allows the application to start even without crypto support
 
     class NewAESCipher(object):
         __slots__ = ('aes_key', 'iv', 'cipher', 'mode')

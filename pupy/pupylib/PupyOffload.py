@@ -16,7 +16,14 @@ import errno
 import ssl
 
 from pupy.network.lib import socks
-from dnslib import QTYPE
+try:
+    from dnslib import QTYPE
+except ImportError:
+    # Provide stub for dnslib when not available
+    class QTYPE:
+        A = 1
+        AAAA = 28
+        reverse = {1: 'A', 28: 'AAAA'}
 
 if sys.version_info.major > 2:
     from urllib.parse import urlparse

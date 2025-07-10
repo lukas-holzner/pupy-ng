@@ -43,8 +43,50 @@ import netaddr
 
 from threading import Thread, RLock, Event
 
-from dnslib import DNSRecord, RR, QTYPE, A, AAAA, EDNS0, RCODE
-from dnslib.server import DNSHandler, BaseResolver, DNSLogger
+try:
+    from dnslib import DNSRecord, RR, QTYPE, A, AAAA, EDNS0, RCODE
+    from dnslib.server import DNSHandler, BaseResolver, DNSLogger
+except ImportError:
+    # Provide stubs for dnslib when not available
+    class DNSRecord:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("dnslib is not available. Install it for DNS support.")
+    
+    class RR:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("dnslib is not available. Install it for DNS support.")
+    
+    class QTYPE:
+        A = 1
+        AAAA = 28
+        
+    class A:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("dnslib is not available. Install it for DNS support.")
+    
+    class AAAA:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("dnslib is not available. Install it for DNS support.")
+    
+    class EDNS0:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("dnslib is not available. Install it for DNS support.")
+    
+    class RCODE:
+        NOERROR = 0
+        NXDOMAIN = 3
+    
+    class DNSHandler:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("dnslib is not available. Install it for DNS support.")
+    
+    class BaseResolver:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("dnslib is not available. Install it for DNS support.")
+    
+    class DNSLogger:
+        def __init__(self, *args, **kwargs):
+            raise ImportError("dnslib is not available. Install it for DNS support.")
 
 from . import ascii85
 
