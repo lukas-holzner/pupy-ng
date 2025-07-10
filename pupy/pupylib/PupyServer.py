@@ -37,7 +37,8 @@ from __future__ import unicode_literals
 
 from threading import Thread, Event, Lock
 
-import imp
+import importlib.util
+import importlib.machinery
 import sys
 
 from os import path, listdir, stat, unlink
@@ -402,8 +403,7 @@ class Listener(Thread):
 
 class PupyServer(object):
     SUFFIXES = tuple([
-        suffix for suffix, _, rtype in imp.get_suffixes()
-        if rtype == imp.PY_SOURCE
+        suffix for suffix in importlib.machinery.SOURCE_SUFFIXES
     ])
 
     def __init__(self, config, credentials):
@@ -951,7 +951,9 @@ class PupyServer(object):
                 continue
 
             try:
-                module_object = imp.load_source(modname, modpath)
+                spec = importlib.util.spec_from_file_location(modname, modpath)
+                module_object = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module_object)
                 logger.debug('Load module %s', modname)
                 self.modules[modname] = module_object
                 self._modules_stats[modname] = current_stats.st_mtime

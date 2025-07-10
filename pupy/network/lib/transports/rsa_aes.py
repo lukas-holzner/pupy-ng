@@ -15,7 +15,11 @@ from ..base import BasePupyTransport, TransportError
 
 import traceback
 import struct
-import rsa
+try:
+    import rsa
+except ImportError:
+    from ..rsa_compat import *
+    import pupy.network.lib.rsa_compat as rsa
 
 from io import open
 

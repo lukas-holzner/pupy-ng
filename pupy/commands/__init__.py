@@ -7,7 +7,8 @@ from __future__ import print_function
 __all__ = ('InvalidCommand', 'Commands')
 
 import os
-import imp
+import importlib.util
+import importlib.machinery
 
 from pupy.pupylib.PupyCompleter import commands_completer
 from pupy.pupylib.PupyModule import PupyArgumentParser
@@ -30,8 +31,7 @@ class CommandsNamespace(object):
 
 class Commands(object):
     SUFFIXES = tuple([
-        suffix for suffix, _, rtype in imp.get_suffixes() \
-        if rtype == imp.PY_SOURCE
+        suffix for suffix in importlib.machinery.SOURCE_SUFFIXES
     ])
 
     def __init__(self):
@@ -63,7 +63,10 @@ class Commands(object):
 
             if command not in self._commands or self._commands_stats[command] != current_stat.st_mtime:
                 try:
-                    self._commands[command] = imp.load_source(command, source)
+                    spec = importlib.util.spec_from_file_location(command, source)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    self._commands[command] = module
                     self._commands_stats[command] = current_stat.st_mtime
                 except IOError:
                     pass

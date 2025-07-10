@@ -29,7 +29,11 @@ except Exception as e:
     logger.warning(e)
     M2Crypto=None
     
-import rsa
+try:
+    import rsa
+except ImportError:
+    from pupy.network.lib.rsa_compat import *
+    import pupy.network.lib.rsa_compat as rsa
 
 from hashlib import md5
 try:

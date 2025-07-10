@@ -17,7 +17,31 @@ import locale
 import fcntl
 import termios
 
-import hexdump
+try:
+    import hexdump
+except ImportError:
+    # Create a basic hexdump compatibility layer
+    class hexdump:
+        @staticmethod
+        def dumpgen(data):
+            """Generate hexdump lines similar to hexdump.dumpgen"""
+            if isinstance(data, str):
+                data = data.encode('utf-8')
+            
+            lines = []
+            for i in range(0, len(data), 16):
+                chunk = data[i:i+16]
+                hex_part = ' '.join(f'{b:02x}' for b in chunk)
+                hex_part = hex_part.ljust(47)  # 16 * 3 - 1 = 47
+                
+                ascii_part = ''.join(
+                    chr(b) if 32 <= b < 127 else '.' for b in chunk
+                )
+                
+                line = f'{i:08x}: {hex_part} {ascii_part}'
+                lines.append(line)
+            
+            return lines
 
 from pygments import highlight
 from pygments.formatters import TerminalFormatter

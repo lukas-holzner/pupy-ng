@@ -17,18 +17,79 @@ import sys
 import threading
 import random
 import string
-import tornado.ioloop
-import tornado.web
-import tornado.template
+try:
+    import tornado.ioloop
+    import tornado.web
+    import tornado.template
+    from tornado.websocket import WebSocketHandler as TornadoWebSocketHandler
+    from tornado.web import RequestHandler as TornadoRequestHandler
+    from tornado.web import StaticFileHandler as TornadoStaticFileHandler
+    from tornado.web import ErrorHandler as TornadoErrorHandler
+    from tornado.web import Application as TornadoApplication
+except ImportError:
+    # Provide stubs for tornado when not available
+    class tornado:
+        class ioloop:
+            class IOLoop:
+                def __init__(self):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+                
+                @staticmethod
+                def current():
+                    raise ImportError("tornado is not available. Install it for web server support.")
+                
+                @staticmethod
+                def instance():
+                    raise ImportError("tornado is not available. Install it for web server support.")
+                
+                def start(self):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+                
+                def stop(self):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+        
+        class web:
+            class Application:
+                def __init__(self, *args, **kwargs):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+                
+                def listen(self, *args, **kwargs):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+            
+            class RequestHandler:
+                def __init__(self, *args, **kwargs):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+        
+        class template:
+            class Template:
+                def __init__(self, *args, **kwargs):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+                
+                def generate(self, *args, **kwargs):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+        
+        class websocket:
+            class WebSocketHandler:
+                def __init__(self, *args, **kwargs):
+                    raise ImportError("tornado is not available. Install it for web server support.")
+    
+    import sys
+    sys.modules['tornado'] = tornado
+    sys.modules['tornado.ioloop'] = tornado.ioloop
+    sys.modules['tornado.web'] = tornado.web
+    sys.modules['tornado.template'] = tornado.template
+    sys.modules['tornado.websocket'] = tornado.websocket
+    
+    TornadoWebSocketHandler = tornado.websocket.WebSocketHandler
+    TornadoRequestHandler = tornado.web.RequestHandler
+    TornadoStaticFileHandler = tornado.web.RequestHandler
+    TornadoErrorHandler = tornado.web.RequestHandler
+    TornadoApplication = tornado.web.Application
 
 from os import path, unlink
 from ssl import create_default_context
 
-from tornado.websocket import WebSocketHandler as TornadoWebSocketHandler
-from tornado.web import RequestHandler as TornadoRequestHandler
-from tornado.web import StaticFileHandler as TornadoStaticFileHandler
-from tornado.web import ErrorHandler as TornadoErrorHandler
-from tornado.web import Application as TornadoApplication
+
 
 from pupy.pupylib.PupyOutput import Error
 from pupy.pupylib.PupyOutput import Success
