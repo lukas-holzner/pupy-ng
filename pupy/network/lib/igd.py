@@ -26,7 +26,10 @@ else:
 try:
     from http_parser.parser import HttpParser
 except ImportError:
-    from http_parser.pyparser import HttpParser
+    try:
+        from http_parser.pyparser import HttpParser
+    except ImportError:
+        from .http_parser_compat import HttpParser
 
 from xml.etree.ElementTree import fromstring
 

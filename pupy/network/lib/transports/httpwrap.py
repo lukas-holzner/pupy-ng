@@ -13,7 +13,10 @@ from os import path, stat
 try:
     from http_parser.parser import HttpParser
 except ImportError:
-    from http_parser.pyparser import HttpParser
+    try:
+        from http_parser.pyparser import HttpParser
+    except ImportError:
+        from ..http_parser_compat import HttpParser
 
 from pupy.network.lib.buffer import Buffer
 from pupy.network.lib import getLogger

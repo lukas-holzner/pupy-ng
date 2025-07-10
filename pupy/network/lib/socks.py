@@ -79,7 +79,10 @@ from base64 import b64encode
 try:
     from http_parser.parser import HttpParser
 except ImportError:
-    from http_parser.pyparser import HttpParser
+    try:
+        from http_parser.pyparser import HttpParser
+    except ImportError:
+        from .http_parser_compat import HttpParser
 
 try:
     from urllib_auth import (
